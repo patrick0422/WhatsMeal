@@ -1,0 +1,114 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="7dp"
+    android:background="@drawable/widget_style"
+    android:theme="@style/ThemeOverlay.WhatsMeal.AppWidgetContainer">
+    <LinearLayout
+        android:id="@+id/contentWrap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+        <RelativeLayout
+            android:id="@+id/buttonWrap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#00000000"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/ic_baseline_arrow_left_24"/>
+            <ImageButton
+                android:id="@+id/btnRefresh"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#00000000"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_baseline_home_24"/>
+            <ImageButton
+                android:id="@+id/btnNext"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#00000000"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_baseline_arrow_right_24"/>
+        </RelativeLayout>
+        <LinearLayout
+            android:id="@+id/breakfastWrap"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvBreakfast"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=
+                    "조식\n
+친환경쌀밥\n
+쇠고기미역국\n
+닭감자조림\n
+매운콩나물무침\n
+스크램블에그\n
+배추김치\n
+사과"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="15dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/lunchWrap"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvLunch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=
+                    "중식\n
+혼합잡곡밥\n
+메밀비빔국수\n
+아욱된장국\n
+오향장육\n
+보쌈김치\n
+아이스크림"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="15dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/dinnerWrap"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvDinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=
+                    "석식\n
+백미밥\n
+순두부달걀탕\n
+궁중떡볶이\n
+오이사과무침\n
+김치닭갈비볶음\n
+깍두기"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="15dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
