@@ -44,9 +44,7 @@ fun transformData(response: Response<RawRawResult>): mealServiceDietInfoResult? 
     val result = resultWrap["RESULT"] as LinkedTreeMap<String, Any>
 
 
-    println(list_total_count)
     val headResult = Head(list_total_count as Double, Result(result["CODE"] as String, result["MESSAGE"] as String))
-
 
 
     val rowWrap = mealServiceDietInfo[1] as  LinkedTreeMap<String, Any>
@@ -119,7 +117,9 @@ fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
         val MLSV_FGR: String = i["MLSV_FGR"] as String
 
         // 요리명
-        val DDISH_NM: String = i["DDISH_NM"] as String
+        val rawList = i["DDISH_NM"] as String
+
+        val DDISH_NM: String = rawList.replace("<br/>", "\n")
 
         // 원산지정보
         val ORPLC_INFO: String = i["ORPLC_INFO"] as String
