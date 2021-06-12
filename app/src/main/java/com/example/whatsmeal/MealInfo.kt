@@ -13,6 +13,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Reader
+import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -31,9 +32,9 @@ class HandleAs(val service: Service) {
 
 fun transformData(response: Response<RawRawResult>): mealServiceDietInfoResult? {
     var mealServiceDietInfoResult: mealServiceDietInfoResult
-
     val rrResult = response.body() as RawRawResult
     val mealServiceDietInfo = rrResult.mealServiceDietInfo
+
     val headWrap = mealServiceDietInfo[0] as LinkedTreeMap<String, Any>
     val head = headWrap["head"] as ArrayList<Any>
 

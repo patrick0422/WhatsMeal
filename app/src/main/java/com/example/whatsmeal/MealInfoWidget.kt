@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.text.HtmlCompat
 import com.google.gson.internal.LinkedTreeMap
+import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.concurrent.thread
@@ -26,8 +27,9 @@ class MealInfoWidget : AppWidgetProvider() {
     var breakfast: String = ""
     var lunch: String = ""
     var dinner: String = ""
+    var textDate: String = ""
 
-    var i = 0
+    private var i: Int = 0
 
     private val service = RetrofitClient().getService().create(Service::class.java)
 
@@ -45,9 +47,7 @@ class MealInfoWidget : AppWidgetProvider() {
         val nextIntent = Intent(context, MealInfoWidget::class.java).setAction("Next")
         remoteViews.setOnClickPendingIntent(R.id.btnNext, PendingIntent.getBroadcast(context, 0, nextIntent, 0))
 
-        updateMeal(remoteViews, getDate(0))
-
-        remoteViews.setTextViewText(R.id.tvBreakfast, "왜 안돼 싸발!!!!!!!")
+        updateMeal(appWidgetManager, ComponentName(context, MealInfoWidget::class.java), remoteViews, getDate(0))
 
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews)
     }
@@ -62,22 +62,27 @@ class MealInfoWidget : AppWidgetProvider() {
         val remoteViews = RemoteViews(context!!.packageName, R.layout.mealinfo_widget_1x1)
         val componentName = ComponentName(context, MealInfoWidget::class.java)
 
+        remoteViews.setTextViewText(R.id.tvDate, "")
+        remoteViews.setTextViewText(R.id.tvBreakfast, "")
+        remoteViews.setTextViewText(R.id.tvLunch, "불러오는중...")
+        remoteViews.setTextViewText(R.id.tvDinner, "")
+        appWidgetManager.updateAppWidget(componentName, remoteViews)
 
         if (action.equals("Refresh")) {
             i = 0
-            updateMeal(remoteViews, getDate(i))
-
-            remoteViews.setTextViewText(R.id.tvBreakfast, "왜 안돼 싸발!!!!!!!")
+            updateMeal(appWidgetManager, componentName, remoteViews, getDate(i))
         }
         else if (action.equals("Previous")) {
-            updateMeal(remoteViews, getDate(--i))
+            updateMeal(appWidgetManager, componentName, remoteViews, getDate(--i))
         }
         else if (action.equals("Next")) {
-            updateMeal(remoteViews, getDate(++i))
+            updateMeal(appWidgetManager, componentName, remoteViews, getDate(++i))
         }
 
-        Thread.sleep(500)
 
+        Thread.sleep(1000)
+
+        remoteViews.setTextViewText(R.id.tvDate, textDate)
         remoteViews.setTextViewText(R.id.tvBreakfast, breakfast)
         remoteViews.setTextViewText(R.id.tvLunch, lunch)
         remoteViews.setTextViewText(R.id.tvDinner, dinner)
@@ -86,40 +91,48 @@ class MealInfoWidget : AppWidgetProvider() {
     }
 
 
-    private fun updateMeal(remoteViews: RemoteViews, date: String) {
+    private fun updateMeal(appWidgetManager: AppWidgetManager, componentName: ComponentName, remoteViews: RemoteViews, date: String) {
         Log.d(TAG, "updateMeal() Called, i = $date")
         thread(start = true) {
             Log.d(TAG, "thread Started")
 
-            val result = transformData(HandleAs(service).rRR(date)!!)!!
-            Log.d(TAG, result.toString())
+            try {
+                val result = transformData(HandleAs(service).rRR(date)!!)!!
 
-//            if (result.head.result.code.equals("INFO-200")) {
-//                remoteViews.setTextViewText(R.id.tvBreakfast, "정보 없음")
-//                remoteViews.setTextViewText(R.id.tvLunch, "정보 없음")
-//                remoteViews.setTextViewText(R.id.tvDinner, "정보 없음")
-//            }
+                Log.d(TAG, result.toString())
 
-            remoteViews.setTextViewText(R.id.tvBreakfast, "정보 없음")
-            remoteViews.setTextViewText(R.id.tvLunch, "정보 없음")
-            remoteViews.setTextViewText(R.id.tvDinner, "정보 없음")
+                textDate = date
+                remoteViews.setTextViewText(R.id.tvDate, date)
 
+                breakfast = result.row[0].DDISH_NM
+                Log.d(TAG, "breakfast: $breakfast")
+                remoteViews.setTextViewText(R.id.tvBreakfast, breakfast)
 
-            breakfast = result.row[0].DDISH_NM
-            Log.d(TAG, "breakfast: $breakfast")
-            remoteViews.setTextViewText(R.id.tvBreakfast, breakfast)
+                lunch = result.row[1].DDISH_NM
+                Log.d(TAG, "lunch: $lunch")
+                remoteViews.setTextViewText(R.id.tvLunch, lunch)
 
-            lunch = result.row[1].DDISH_NM
-            Log.d(TAG, "lunch: $lunch")
-            remoteViews.setTextViewText(R.id.tvLunch, lunch)
+                if (result.head.list_total_count == 3.0) {
+                    dinner = result.row[2].DDISH_NM
+                    Log.d(TAG, "dinner: $dinner")
+                    remoteViews.setTextViewText(R.id.tvDinner, dinner)
+                }
 
-            if (result.head.list_total_count == 3.0) {
-                dinner = result.row[2].DDISH_NM
-                Log.d(TAG, "dinner: $dinner")
+                appWidgetManager.updateAppWidget(componentName, remoteViews)
+            } catch(e: NullPointerException) {
+                Log.d(TAG, "Exception Catched!")
+
+                textDate = date
+                breakfast = "정보 없음"
+                lunch = "정보 없음"
+                dinner = "정보 없음"
+
+                remoteViews.setTextViewText(R.id.tvDate, date)
+                remoteViews.setTextViewText(R.id.tvBreakfast, breakfast)
+                remoteViews.setTextViewText(R.id.tvLunch, lunch)
                 remoteViews.setTextViewText(R.id.tvDinner, dinner)
             }
         }
-
     }
 
     override fun onEnabled(context: Context) {
@@ -147,6 +160,7 @@ class MealInfoWidget : AppWidgetProvider() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getDate(a: Int): String {
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 
@@ -157,6 +171,8 @@ class MealInfoWidget : AppWidgetProvider() {
         return LocalDate.of(year, month, day).format(DateTimeFormatter.ofPattern("yyyyMMdd"))
     }
 }
+
+
 
 //fun main() {
 //    val service = RetrofitClient().getService().create(Service::class.java)
