@@ -2,6 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginVertical="7dp"
+    android:layout_marginHorizontal="3dp"
     android:background="@drawable/widget_style"
     android:theme="@style/ThemeOverlay.WhatsMeal.AppWidgetContainer">
     <LinearLayout
