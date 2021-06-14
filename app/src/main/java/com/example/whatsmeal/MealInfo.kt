@@ -1,32 +1,16 @@
 package com.example.whatsmeal
 
-import android.os.Build
-import android.util.JsonReader
-import android.util.Log
-import androidx.annotation.RequiresApi
 import com.google.gson.internal.LinkedTreeMap
-import org.json.JSONArray
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.Reader
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.collections.ArrayList
 
 const val BASEURL = "https://open.neis.go.kr/hub/mealServiceDietInfo"
 const val KEY = "35533bbbb92744a88c2557fd1691fad4"
 
-class HandleAs(val service: Service) {
-    fun rRR(date: String): Response<RawRawResult>? {
-        val getMeal = service.getResult(KEY, "json", "1", "100", "F10", "7380292", date)
+fun requestMeal(service: Service, date: String): Response<RawRawResult>? {
+    val getMeal = service.getResult(KEY, "json", "1", "100", "F10", "7380292", date)
 
-        return getMeal.execute()
-    }
+    return getMeal.execute()
 }
 
 fun transformData(response: Response<RawRawResult>): mealServiceDietInfoResult? {
@@ -58,38 +42,6 @@ fun transformData(response: Response<RawRawResult>): mealServiceDietInfoResult? 
     return mealServiceDietInfoResult
 }
 
-fun printData(response: Response<RawRawResult>) {
-
-    val rrResult = response.body() as RawRawResult
-    val mealServiceDietInfo = rrResult.mealServiceDietInfo
-    println(mealServiceDietInfo)
-
-    // - - - - head START - - - -
-
-    val headWrap = mealServiceDietInfo[0] as LinkedTreeMap<String, Any>
-    val head = headWrap["head"] as ArrayList<Any>
-    println(head)
-    val list_total_count = head[0]
-
-    val resultWrap = head[1] as LinkedTreeMap<String, Any>
-    val result = resultWrap["RESULT"] as LinkedTreeMap<String, Any>
-    println(result)
-
-    println("head: list_total_count = ${list_total_count}, RESULT = (CODE = ${result["CODE"]}, MESSAGE = ${result["MESSAGE"]})")
-
-    // - - - - head END  - - - -
-
-
-
-    // - - - - row START - - - -
-
-    val rowWrap = mealServiceDietInfo[1] as  LinkedTreeMap<String, Any>
-    val row = rowWrap["row"] as ArrayList<LinkedTreeMap<String, Any>>
-
-    var mealList = addMeal(row)
-    // - - - - row END - - - -
-}
-
 fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
 
 
@@ -119,7 +71,20 @@ fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
         // 요리명
         val rawList = i["DDISH_NM"] as String
 
-        val DDISH_NM: String = rawList.replace("<br/>", "\n")
+        var mealList = rawList.split("<br/>")
+
+        var DDISH_NM = ""
+//        var DDISH_NM: String = rawList.replace("<br/>", "\n")
+
+        for (meal in mealList) {
+            var st = meal.substringBefore(".")
+            st = st.substringBefore("*")
+            for (i in 0..9){
+                st = st.substringBefore(i.toString())
+            }
+            DDISH_NM += st + "\n"
+        }
+
 
         // 원산지정보
         val ORPLC_INFO: String = i["ORPLC_INFO"] as String
