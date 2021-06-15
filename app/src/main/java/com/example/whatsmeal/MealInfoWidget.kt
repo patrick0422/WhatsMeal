@@ -75,6 +75,8 @@ class MealInfoWidget : AppWidgetProvider() {
 
             remoteViews.setTextViewText(R.id.tvDate, date)
 
+            //TODO 조식, 중식, 석식 등 Gone이나 Invisible로 하고 tvLoading Visible하게 하기
+
             try {
                 val result = transformData(requestMeal(service, date)!!)!!
 

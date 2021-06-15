@@ -4,6 +4,17 @@
     android:layout_marginVertical="7dp"
     android:background="@drawable/widget_style"
     android:theme="@style/ThemeOverlay.WhatsMeal.AppWidgetContainer">
+    <TextView
+        android:id="@+id/tvLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="로딩중.."
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="30dp"/>
     <LinearLayout
         android:id="@+id/contentWrap"
         android:layout_width="match_parent"
@@ -47,7 +58,7 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:textSize="30dp"/>
+            android:textSize="20dp"/>
         <LinearLayout
             android:id="@+id/breakfastWrap"
             android:layout_width="match_parent"
