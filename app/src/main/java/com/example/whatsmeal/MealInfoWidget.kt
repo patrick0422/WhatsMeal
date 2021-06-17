@@ -6,8 +6,10 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
+import android.view.View.*
 import android.widget.RemoteViews
 import java.lang.NullPointerException
 import java.time.LocalDate
@@ -73,17 +75,20 @@ class MealInfoWidget : AppWidgetProvider() {
         thread(start = true) {
             Log.d(TAG, "thread Started")
 
-            remoteViews.setTextViewText(R.id.tvDate, date)
+            val dateform = "${date.substring(0, 4)}년 ${date.substring(4, 6)}월 ${date.substring(6, 8)}일"
 
-            //TODO 조식, 중식, 석식 등 Gone이나 Invisible로 하고 tvLoading Visible하게 하기
+            remoteViews.setTextViewText(R.id.tvDate, dateform)
+
+            //TODO 조식, 중식, 석식 등 Gone 이나 Invisible 로 하고 tvLoading Visible 하게 하기
+            remoteViews.setViewVisibility(R.id.mealWrap, GONE)
+            remoteViews.setViewVisibility(R.id.tvLoading, VISIBLE)
 
             try {
                 val result = transformData(requestMeal(service, date)!!)!!
 
                 breakfast = result.row[0].DDISH_NM
                 lunch = result.row[1].DDISH_NM
-
-                if (result.head.list_total_count == 3.0) { dinner = result.row[2].DDISH_NM }
+                dinner = if (result.head.list_total_count == 3.0) result.row[2].DDISH_NM else "정보 없음"
 
                 remoteViews.setTextViewText(R.id.tvBreakfast, breakfast)
                 remoteViews.setTextViewText(R.id.tvLunch, lunch)
@@ -95,6 +100,9 @@ class MealInfoWidget : AppWidgetProvider() {
                 remoteViews.setTextViewText(R.id.tvLunch, "정보 없음")
                 remoteViews.setTextViewText(R.id.tvDinner, "정보 없음")
             }
+
+            remoteViews.setViewVisibility(R.id.mealWrap, VISIBLE)
+            remoteViews.setViewVisibility(R.id.tvLoading, GONE)
 
             appWidgetManager.updateAppWidget(componentName, remoteViews)
         }
@@ -116,10 +124,10 @@ class MealInfoWidget : AppWidgetProvider() {
         Log.d(TAG, "onAppWidgetOptionsChanged() Called")
 
         var minWidth = newOptions!!.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-        var maxWidth = newOptions!!.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+        var maxWidth = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
 
-        var minHeight = newOptions!!.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-        var maxHeight = newOptions!!.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        var minHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+        var maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
 
         Log.d(TAG, "min: ${minWidth}x${minHeight}, max: ${maxWidth}x${maxHeight}")
     }
