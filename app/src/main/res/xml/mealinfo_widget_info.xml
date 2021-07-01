@@ -3,10 +3,10 @@
     android:initialKeyguardLayout="@layout/mealinfo_widget"
     android:initialLayout="@layout/mealinfo_widget"
 
-    android:minWidth="141dp"
-    android:minHeight="78dp"
+    android:minWidth="146dp"
+    android:minHeight="442dp"
 
-    android:previewImage="@drawable/example_appwidget_preview"
+    android:previewImage="@drawable/meal_preview"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen"/>

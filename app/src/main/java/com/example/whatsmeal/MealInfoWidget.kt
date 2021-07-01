@@ -15,16 +15,18 @@ import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.concurrent.thread
+import kotlin.math.absoluteValue
+import kotlin.properties.Delegates
 
 
 const val TAG = "WhatsMeal"
 
-class MealInfoWidget : AppWidgetProvider() {
+abstract class MealInfoWidget : AppWidgetProvider() {
     var breakfast: String = ""
     var lunch: String = ""
     var dinner: String = ""
 
-    private var i = 0
+    var i by Delegates.notNull<Int>()
 
     private val service = RetrofitClient().getService().create(Service::class.java)
 
@@ -53,18 +55,23 @@ class MealInfoWidget : AppWidgetProvider() {
         val remoteViews = RemoteViews(context!!.packageName, R.layout.mealinfo_widget)
         val componentName = ComponentName(context, MealInfoWidget::class.java)
 
+        var date: LocalDate = getDate(0)
 
         when (intent!!.action){
             "Refresh" -> {
-                updateMeal(appWidgetManager, componentName, remoteViews, getDate(0))
+                i = 0
+                date = getDate(i)
             }
             "Previous" -> {
-                updateMeal(appWidgetManager, componentName, remoteViews, getDate(--i))
+                date = getDate(--i)
             }
             "Next" -> {
-                updateMeal(appWidgetManager, componentName, remoteViews, getDate(++i))
+                date = getDate(++i)
             }
         }
+
+        val dateString = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        updateMeal(appWidgetManager, componentName, remoteViews, dateString)
 
         appWidgetManager.updateAppWidget(componentName, remoteViews)
     }
@@ -78,8 +85,6 @@ class MealInfoWidget : AppWidgetProvider() {
             val dateform = "${date.substring(0, 4)}년 ${date.substring(4, 6)}월 ${date.substring(6, 8)}일"
 
             remoteViews.setTextViewText(R.id.tvDate, dateform)
-
-            //TODO 조식, 중식, 석식 등 Gone 이나 Invisible 로 하고 tvLoading Visible 하게 하기
             remoteViews.setViewVisibility(R.id.mealWrap, GONE)
             remoteViews.setViewVisibility(R.id.tvLoading, VISIBLE)
 
@@ -111,6 +116,8 @@ class MealInfoWidget : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) {
         // Enter relevant functionality for when the first widget is created
+
+//        onUpdate(context, AppWidgetManager.getInstance(context), appWidgetIds)
     }
 
     override fun onDisabled(context: Context) {
@@ -130,17 +137,35 @@ class MealInfoWidget : AppWidgetProvider() {
         var maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
 
         Log.d(TAG, "min: ${minWidth}x${minHeight}, max: ${maxWidth}x${maxHeight}")
+
+
+//        val remoteViews = RemoteViews(context!!.packageName, R.layout.mealinfo_widget)
+//        val componentName = ComponentName(context, MealInfoWidget::class.java)
+//
+//        updateMeal(appWidgetManager!!, componentName, remoteViews, getDate(0))
+//        appWidgetManager.updateAppWidget(componentName, remoteViews)
     }
 
 
+//TODO 매 달 1일 일자에 0이 들어가 n월 0일을 반환하는 오류 수정 (로직 다시짜야 할 듯)
+    fun getDate(a: Int): LocalDate {
+        var today = LocalDate.now()
 
-    fun getDate(a: Int): String {
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-
-        val year = Integer.parseInt(today.substring(0, 4))
-        val month = Integer.parseInt(today.substring(4, 6))
-        val day = Integer.parseInt(today.substring(6, 8)) + a
-
-        return LocalDate.of(year, month, day).format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        if (a > 0) {
+            return today.plusDays(a.toLong())
+        } else if (a == 0) {
+            return today
+        } else {
+            return today.minusDays(a.absoluteValue.toLong())
+        }
     }
+//    fun getDate(a: Int): String {
+//        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+//
+//        val year = Integer.parseInt(today.substring(0, 4))
+//        val month = Integer.parseInt(today.substring(4, 6))
+//        val day = Integer.parseInt(today.substring(6, 8)) + a
+//
+//        return LocalDate.of(year, month, day).format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+//    }
 }
