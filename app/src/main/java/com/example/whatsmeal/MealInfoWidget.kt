@@ -6,11 +6,14 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View.*
 import android.widget.RemoteViews
+import com.example.whatsmeal.api.RetrofitClient
+import com.example.whatsmeal.api.Service
+import com.example.whatsmeal.api.requestMeal
+import com.example.whatsmeal.api.transformData
 import java.lang.NullPointerException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

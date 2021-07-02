@@ -1,7 +1,6 @@
-package com.example.whatsmeal
+package com.example.whatsmeal.api
 
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.*
 
 interface Service {

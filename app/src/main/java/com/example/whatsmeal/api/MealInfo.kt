@@ -1,4 +1,4 @@
-package com.example.whatsmeal
+package com.example.whatsmeal.api
 
 import com.google.gson.internal.LinkedTreeMap
 import retrofit2.Response

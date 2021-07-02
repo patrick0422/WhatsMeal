@@ -1,14 +1,14 @@
-package com.example.whatsmeal
+package com.example.whatsmeal.api
 
 import com.google.gson.internal.LinkedTreeMap
 
 data class mealServiceDietInfo (
-    var head: Head,
-    val row:  ArrayList<LinkedTreeMap<String, Any>>
+        var head: Head,
+        val row:  ArrayList<LinkedTreeMap<String, Any>>
 )
 data class mealServiceDietInfoResult (
-    var head: Head,
-    val row:  ArrayList<Meal>
+        var head: Head,
+        val row:  ArrayList<Meal>
 )
 
 data class Head (
