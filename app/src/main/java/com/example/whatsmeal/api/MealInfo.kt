@@ -4,15 +4,11 @@ import com.google.gson.internal.LinkedTreeMap
 import retrofit2.Response
 import kotlin.collections.ArrayList
 
+const val BASEURL = "https://open.neis.go.kr/hub/mealServiceDietInfo"
 const val KEY = "35533bbbb92744a88c2557fd1691fad4"
-const val Type = "json"
-const val pIndex = "1"
-const val pSize = "100"
-const val sidoCode = "F10"
-const val schoolCode = "7380292"
 
 fun requestMeal(service: Service, date: String): Response<RawRawResult>? {
-    val getMeal = service.getResult(KEY, Type, pIndex, pSize, sidoCode, schoolCode, date)
+    val getMeal = service.getResult(KEY, "json", "1", "100", "F10", "7380292", date)
 
     return getMeal.execute()
 }
@@ -26,13 +22,13 @@ fun transformData(response: Response<RawRawResult>): mealServiceDietInfoResult? 
     val head = headWrap["head"] as ArrayList<Any>
 
     val cntWrap = head[0] as LinkedTreeMap<String, Any>
-    val listTotalCount = cntWrap["list_total_count"]
+    val list_total_count = cntWrap["list_total_count"]
 
     val resultWrap = head[1] as LinkedTreeMap<String, Any>
     val result = resultWrap["RESULT"] as LinkedTreeMap<String, Any>
 
 
-    val headResult = Head(listTotalCount as Double, Result(result["CODE"] as String, result["MESSAGE"] as String))
+    val headResult = Head(list_total_count as Double, Result(result["CODE"] as String, result["MESSAGE"] as String))
 
 
     val rowWrap = mealServiceDietInfo[1] as  LinkedTreeMap<String, Any>
@@ -49,7 +45,7 @@ fun transformData(response: Response<RawRawResult>): mealServiceDietInfoResult? 
 fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
 
 
-    val mealList = ArrayList<Meal>()
+    val MealList = ArrayList<Meal>()
 
     for (i in row) {
         // 시도교육청코드
@@ -75,15 +71,16 @@ fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
         // 요리명
         val rawList = i["DDISH_NM"] as String
 
-        var meals = rawList.split("<br/>")
+        var mealList = rawList.split("<br/>")
 
         var DDISH_NM = ""
+//        var DDISH_NM: String = rawList.replace("<br/>", "\n")
 
-        for (meal in meals) {
+        for (meal in mealList) {
             var st = meal.substringBefore(".")
             st = st.substringBefore("*")
-            for (j in 0..9){
-                st = st.substringBefore(j.toString())
+            for (i in 0..9){
+                st = st.substringBefore(i.toString())
             }
             DDISH_NM += st + "\n"
         }
@@ -101,7 +98,7 @@ fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
         // 급식종료일자
         val MLSV_TO_YMD: String = i["MLSV_TO_YMD"] as String
 
-        mealList.add(
+        MealList.add(
             Meal(
                 ATPT_OFCDC_SC_CODE,
                 ATPT_OFCDC_SC_NM,
@@ -121,5 +118,5 @@ fun addMeal(row: ArrayList<LinkedTreeMap<String, Any>>) : ArrayList<Meal> {
         )
     }
 
-    return mealList
+    return MealList
 }
